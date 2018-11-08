@@ -1,0 +1,23 @@
+{
+    "name"          : "node-red-node-nighttime",
+    "version"       : "0.0.1",
+    "description"   : "A Node-RED node that checks if it's night or day using the DarkSky API",
+    "dependencies"  : {
+    },
+    "repository" : {
+        "type":"git",
+        "url":"https://github.com/arvage/nighttime"
+    },
+    "license": "Apache-2.0",
+    "keywords": [ "night" ],
+    "node-red"      : {
+        "nodes"     : {
+            "nighttime": "nightime.js"
+        }
+    },
+    "author": {
+        "name": "Armin Gorji",
+        "email": "arvage@yahoo.com",
+        "url": "http://nodered.org"
+    }
+}

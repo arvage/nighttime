@@ -1,0 +1,82 @@
+<!--
+
+-->
+
+<script type="text/x-red" data-template-name="api-credentials">
+    <div id="node-config-nighttime-app-keys">
+        <div class="form-row">
+            <p style="margin-top: 10px;"><b>1.</b> <span data-i18n="nighttime.label.register"></span> <a href="https://darksky.net/dev/" target="_blank" style="text-decoration:underline;">Dark Sky</a>.</p>
+        </div>
+        <div class="form-row">
+            <p style="margin-top: 10px;"><b>2.</b> <span data-i18n="nighttime.label.copy"></span>:</p>
+        </div>
+        <div class="form-row">
+            <label style="margin-left: 10px; margin-right: -10px;" for="node-config-input-key_identifier"><i class="fa fa-user"></i> <span data-i18n="nighttime.label.name"></span></label>
+            <input type="text" id="node-config-input-key_identifier">
+        </div>
+        <div class="form-row">
+            <label style="margin-left: 10px; margin-right: -10px;" for="node-config-input-client_key"><i class="fa fa-key"></i> <span data-i18n="nighttime.label.key"></span></label>
+            <input type="password" id="node-config-input-client_key">
+        </div>
+    </div>
+</script>
+
+<script type="text/javascript">
+(function() {
+    RED.nodes.registerType('api-credentials',{
+        category: 'config',
+        defaults: {
+            key_identifier: {value:""}
+        },
+        credentials: {
+            key_identifier: {type:"text"},
+            client_key: { type:"password"}
+        },
+        label: function() { return this.key_identifier; },
+        exportable: false
+    });
+})();
+</script>
+
+<script type="text/x-red" data-template-name="nighttime">
+    <div class="form-row">
+        <label for="node-input-nighttime"><i class="fa fa-user"></i> <span data-i18n="nighttime.label.nighttime"></span></label>
+        <input type="text" id="node-input-nighttime">
+    </div>
+    <div class="form-row" id="weather-coordinates">
+        <label for=""><i class="fa fa-location-arrow"></i> <span data-i18n="nighttime.label.latitude"></span></label>
+        <input type="text" class="weather-location-input" id="node-input-lat" style="width: 180px; margin-bottom: 7px" data-i18n="[placeholder]nighttime.placeholder.latitude">
+        </br>
+        <label for=""><i class="fa fa-location-arrow"></i> <span data-i18n="nighttime.label.longitude"></span></label>
+        <input type="text" class="weather-location-input" id="node-input-lon" style="width: 180px" data-i18n="[placeholder]nighttime.placeholder.longitude">
+    </div>
+    <div class="form-row">
+        <label for="node-input-name"><i class="icon-tag"></i> <span data-i18n="nighttime.label.name"></span></label>
+        <input type="text" id="node-input-name" data-i18n="[placeholder]nighttime.placeholder.name">
+    </div>
+</script>
+
+<script type="text/javascript">
+    RED.nodes.registerType('nighttime',{
+        category: 'weather',
+        color: '#7AA0D2',
+        defaults: {
+            api: {type:"api-credentials",required:true},
+            lon: {value:"", validate:function(v) {return ((v>=-180) && (v<=180));} },
+            lat: {value:"", validate:function(v) {return ((v>=-90) && (v<=90));} },
+        },
+        inputs:0,
+        outputs:1,
+        icon: "weather.png",
+        label: function() { return this.name||"nighttime"; },
+        labelStyle: function() { return this.name?"node_label_italic":""; }
+    });
+</script>
+
+<script type="text/x-red" data-help-name="nighttime">
+    <p>A simple node indicating if it's day or night.(is it dark or not) </p>
+    <p>The node sets: <code>msg.payload</code> to "day" or "night" payloads</p>
+    <p>This is done using DarkSky API and with latitude and longitude set of coordinates.</p>
+    <p>You need to open free account on DarkSky.net and get an API key in order to make this node work.</p>
+    <p>Powered by the <a href="https://darksky.net/poweredby/" target="_blank">Dark Sky Forecast API</a>.</p>
+</script>
