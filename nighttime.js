@@ -65,17 +65,15 @@ module.exports = function(RED) {
                         }
                         sunset = jsun.daily.data[when].sunsetTime;
 			if ( currenttime < sunset) {
-			this.status({fill:"yellow",shape:"dot",text:"Day"});
+			node.status({fill:"yellow",shape:"dot",text:"Day"});
 			msg.topic = "isNight";
 			msg.payload = false;
-			msg.payload.currenttime = currenttime;
 			}
 
 			if (currenttime > sunset) {
-			this.status({fill:"blue",shape:"dot",text:"Night"});
+			node.status({fill:"blue",shape:"dot",text:"Night"});
 			msg.topic = "isNight";
 			msg.payload = true;
-			msg.payload.currenttime = currenttime;
 			}
                         callback();
                     }
@@ -109,10 +107,10 @@ module.exports = function(RED) {
                             node.error(err,msg);
                         } else {
                             var msgString = JSON.stringify(msg.payload);
-                            if (msgString !== previousdata) {
-                                previousdata = msgString;
+//                            if (msgString !== previousdata) {
+//                                previousdata = msgString;
                                 node.send(msg);
-                            }
+//                            }
                         }
                     });
                 }
