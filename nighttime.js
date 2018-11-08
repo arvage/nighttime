@@ -52,9 +52,8 @@ module.exports = function(RED) {
         msg.location = {};
         //If there is a value missing, the URL is not initialised.
 
-        if (typeof(node.lang) == 'undefined') { node.lang = 'en'; }
         if (node.lat && node.lon && node.apikey) {
-            url = ("https://api.darksky.net/forecast/" + node.apikey + "/" + node.lat + "," + node.lon + "?units=" + node.units + "&lang=" + node.lang);
+            url = ("https://api.darksky.net/forecast/" + node.apikey + "/" + node.lat + "," + node.lon);
             when = 0;
         }
         //If the URL is not initialised, there has been an error with the input data,
@@ -73,31 +72,23 @@ module.exports = function(RED) {
                         return callback(RED._("nighttime.error.incorrect-apikey"));
                     } else {
                         var jsun;
+			var currenttime = new Date().getTime() / 1000;
+			var sunset;
                         try {
                             jsun = JSON.parse(weather);
                         } catch (err) {
                             return callback(RED._("nighttime.error.api-response", { response:weather }));
                         }
-                        msg.data = jsun;
-                        msg.payload.weather = jsun.daily.data[when].icon;
-                        msg.payload.detail = jsun.daily.data[when].summary;
-                        msg.payload.humidity = jsun.daily.data[when].humidity;
-                        msg.payload.maxtemp = jsun.daily.data[when].temperatureMax;
-                        msg.payload.mintemp = jsun.daily.data[when].temperatureMin;
-                        msg.payload.windspeed = jsun.daily.data[when].windSpeed;
-                        msg.payload.winddirection = jsun.daily.data[when].windBearing;
-                        msg.payload.lat = jsun.latitude;
-                        msg.payload.lon = jsun.longitude;
-                        msg.payload.clouds = jsun.daily.data[when].cloudCover;
-                        msg.payload.precipitation = jsun.daily.data[when].precipProbability;
-                        msg.payload.sunrise = jsun.daily.data[when].sunriseTime;
-                        msg.payload.sunset = jsun.daily.data[when].sunsetTime;
-                        msg.payload.units = jsun.flags.units;
-                        msg.location.lat = jsun.latitude;
-                        msg.location.lon = jsun.longitude;
-                        msg.time = new Date(jsun.daily.data[when].time*1000);
-                        msg.title = RED._("nighttime.message.weather-forecast");
-                        msg.description = RED._("nighttime.message.weather-info", {time:msg.time.toLocaleString(), lat:msg.location.lat, lon:msg.location.lon});
+                        sunset = jsun.daily.data[when].sunsetTime;
+			if ( currenttime < sunset) {
+			msg.topic = "isNight";
+			msg.payload = false;
+			}
+
+			if (currenttime > sunset) {
+			msg.topic = "isNight";
+			msg.payload = true;
+			}
                         callback();
                     }
                 });
@@ -112,7 +103,7 @@ module.exports = function(RED) {
     function NightTimeNode(n) {
         RED.nodes.createNode(this, n);
         var node = this;
-        this.repeat = 900000;
+        this.repeat = 120000;
         this.interval_id = null;
         var previousdata = null;
 
@@ -202,7 +193,7 @@ module.exports = function(RED) {
         this.key_identifier = n.key_identifier;
     }
 
-    RED.nodes.registerType("api-credentials",APICredentials,{
+    RED.nodes.registerType("nighttime-credentials",APICredentials,{
         credentials: {
             key_identifier: {type:"text"},
             client_key: {type:"password"}
