@@ -1,6 +1,6 @@
 {
   "name": "node-red-contrib-nighttime",
-  "version": "0.0.3",
+  "version": "0.0.5",
   "description": "A Node-RED node that checks if it's night or day using the DarkSky API",
   "dependencies": {},
   "repository": {
