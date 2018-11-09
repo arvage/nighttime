@@ -1,10 +1,10 @@
 A simple node indicating if it's day or night.
 
-The node sets: <code>msg.payload</code> to boolean "true" or "false" payloads.
+The node sets: <code>msg.payload</code> to boolean <code>true</code> or <code>false<code/> payloads.
 
-The node sets: msg.payload to boolean true or false payloads..it also sets a global isNight accessible in all flows.
+The node sets: <code>msg.payload</code> to boolean <code>true</code> or <code>false</code> payloads..it also sets a global <code>isNight</code> accessible in all flows.
 
-it sends a "true" payload if it is dark and "false" if not dark.
+it sends a <code>true</code> payload if it is dark and <code>false</code> if not dark.
 
 This is done using DarkSky API and with latitude and longitude set of coordinates.
 
