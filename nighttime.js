@@ -94,7 +94,7 @@ module.exports = function(RED) {
     function NightTimeNode(n) {
         RED.nodes.createNode(this, n);
         var node = this;
-        this.repeat = 120000;
+        this.repeat = 300000;
         this.interval_id = null;
         var previousdata = null;
         this.interval_id = setInterval( function() {
