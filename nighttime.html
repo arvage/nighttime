@@ -1,44 +1,5 @@
-<script type="text/x-red" data-template-name="nighttime-credentials">
-    <div id="node-config-nighttime-app-keys">
-        <div class="form-row">
-            <p style="margin-top: 10px;"><b>1.</b> <span>Register to get your key at </span> <a href="https://darksky.net/dev/" target="_blank" style="text-decoration:underline;">Dark Sky</a>.</p>
-        </div>
-        <div class="form-row">
-            <p style="margin-top: 10px;"><b>2.</b> <span>Copy the key here and give it a name:</span>:</p>
-        </div>
-        <div class="form-row">
-            <label style="margin-left: 10px; margin-right: -10px;" for="node-config-input-key_identifier"><i class="fa fa-user"></i> <span>Name</span></label>
-            <input type="text" id="node-config-input-key_identifier">
-        </div>
-        <div class="form-row">
-            <label style="margin-left: 10px; margin-right: -10px;" for="node-config-input-client_key"><i class="fa fa-key"></i> <span>Key</span></label>
-            <input type="password" id="node-config-input-client_key">
-        </div>
-    </div>
-</script>
-
-<script type="text/javascript">
-(function() {
-    RED.nodes.registerType('nighttime-credentials',{
-        category: 'config',
-        defaults: {
-            key_identifier: {value:""}
-        },
-        credentials: {
-            key_identifier: {type:"text"},
-            client_key: { type:"password"}
-        },
-        label: function() { return this.key_identifier; },
-        exportable: false
-    });
-})();
-</script>
 
 <script type="text/x-red" data-template-name="nighttime">
-    <div class="form-row">
-        <label for="node-input-nighttime"><i class="fa fa-user"></i> <span>Credentials</span></label>
-        <input type="text" id="node-input-nighttime">
-    </div>
     <div class="form-row" id="weather-coordinates">
         <label for=""><i class="fa fa-location-arrow"></i> <span>Latitude</span></label>
         <input type="text" class="weather-location-input" id="node-input-lat" style="width: 180px; margin-bottom: 7px" placeholder="Latitude">
@@ -51,34 +12,41 @@
         <input type="text" id="node-input-name" placeholder="Name">
     </div>
     <div class="form-row">
+        <p style="margin-top: 10px;"<span>lat and long will autofill if you allowed location service. if not</span></p>
         <p style="margin-top: 10px;"<span>To get your lat long coordinates go to:  </span> <a href="https://www.latlong.net/" target="_blank" style="text-decoration:underline;">www.latlong.net</a></p>
     </div>
 </script>
 
 <script type="text/javascript">
     RED.nodes.registerType('nighttime',{
-        category: 'input',
+        category: 'advanced',
         color: '#7AA0D2',
         defaults: {
-            nighttime: {type:"nighttime-credentials",required:true},
 	    name: {value: "nighttime"},
             lon: {value:"", validate:function(v) {return ((v>=-180) && (v<=180));} },
             lat: {value:"", validate:function(v) {return ((v>=-90) && (v<=90));} },
         },
         inputs:0,
-        outputs:1,
+        outputs:2,
         icon: "weather.png",
         label: function() { 
-		return this.name || "nighttime";}
+        return this.name || "nighttime";},
+        oneditprepare: function() {
+            if (($("#node-input-lat").val() === "") && ($("#node-input-lon").val() === "")) {
+                if ("geolocation" in navigator) {
+                    navigator.geolocation.getCurrentPosition(function(position) {
+                        $("#node-input-lat").val(Number(position.coords.latitude.toFixed(5)));
+                        $("#node-input-lon").val(Number(position.coords.longitude.toFixed(5)));
+                    });
+                }
+            }
+        }
     });
 </script>
 
 <script type="text/x-red" data-help-name="nighttime">
     <p>A simple node indicating if it's day or night.</p>
     <p>The node sets: <code>msg.payload</code> to boolean <code>true</code> or <code>false</code> payloads. it also sets a global <code>isNight</code> accessible in all flows.</p>
-    <p>The node checks every 5 minutes to poll new data.</p>
+    <p>The node checks every minute to poll new data.</p>
     <p>it sends a <code>true</code> payload if it is dark and <code>false</code> if not dark.</p>
-    <p>This is done using DarkSky API and with latitude and longitude set of coordinates.</p>
-    <p>You need to open free account on DarkSky.net and get an API key in order to make this node working.</p>
-    <p>DarkSky provides 1000 calls a day and you can have maximum of 3 nodes for free.to have more nodes you need to get a paid account.</p>
 </script>

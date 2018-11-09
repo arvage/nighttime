@@ -1,102 +1,49 @@
 
 module.exports = function(RED) {
     "use strict";
+    var SunCalc = require('suncalc');
     var https = require("https");
 
-    function assignmentFunction(node, lat, lon, APIconfig, callback) {
-        if (APIconfig && APIconfig.credentials && APIconfig.credentials.client_key) {
-            node.apikey = APIconfig.credentials.client_key.trim();
-        } else {
-            return callback(RED._("nighttime.error.no-credentials"));
-        }
-
+    function assignmentFunction(node, lat, lon, callback) {
         if (90 >= lat && 180 >= lon && lat >= -90 && lon >= -180) {
             node.lat = lat;
             node.lon = lon;
         } else {
             return callback(RED._("nighttime.error.invalid-lat_lon"));
         }
-
         callback();
     }
 
-    function weatherPoll(node, msg, callback) {
-        var url;
-        //If node settings are available, it prioritises these. If the node settings are missing, it checks the msg input instead.
-
-        var today = new Date();
-        if (today.getFullYear() - node.year > 60) {
-            node.warn(RED._("nighttime.warn.more-than-60-years"));
-        } else if (today.getFullYear() - node.year < -10) {
-            node.warn(RED._("nighttime.warn.more-than-10-years"));
-        }
-        //wipe clear the msg properties if they exist, or create it if it doesn't
-        msg.payload = {};
-        msg.location = {};
-        //If there is a value missing, the URL is not initialised.
-
-        if (node.lat && node.lon && node.apikey) {
-            url = ("https://api.darksky.net/forecast/" + node.apikey + "/" + node.lat + "," + node.lon);
-        }
-        //If the URL is not initialised, there has been an error with the input data,
-        //and a node.error is reported.
-        //console.log("URL",url);
-        if (url) {
-            https.get(url, function(res) {
-                var weather = "";
-
-                res.on('data', function(d) {
-                    weather += d;
-                });
-
-                res.on('end', function() {
-                    if (weather === "Forbidden") {
-                        return callback(RED._("nighttime.error.incorrect-apikey"));
-                    } else {
-                        var jsun;
-			var currenttime = new Date().getTime() / 1000;
-			var todaySunrise;
-			var tomorrowSunrise;
-			var todaySunset;
-			var globalContext = node.context().global;
-                        try {
-                            jsun = JSON.parse(weather);
-                        } catch (err) {
-                            return callback(RED._("nighttime.error.api-response", { response:weather }));
-                        }
-                        todaySunset = jsun.daily.data[0].sunsetTime;
-			todaySunrise = jsun.daily.data[0].sunriseTime;
-			tomorrowSunrise = jsun.daily.data[1].sunriseTime;
-			if ( currenttime < todaySunset && currenttime > todaySunrise) {
+        if (node.lat && node.lon) {
+            var times = SunCalc.getTimes(new Date(), n.lat, n.lon);
+            var sunriseStr = times.sunrise.getHours() + ':' + times.sunrise.getMinutes();
+            var sunsetStr = times.sunset.getHours() + ':' + times.sunset.getMinutes();
+            var currenttime = new Date().getHours() + ':' + new Date().getMinutes();
+        	var globalContext = node.context().global;
+			if ( currenttime < sunsetStr && currenttime > sunriseStr) {
 			globalContext.set("isNight",false);
 			node.status({fill:"yellow",shape:"dot",text:"Day"});
 			msg.topic = "isNight";
 			msg.payload = false;
-			}
-
-			if (currenttime > todaySunset && currenttime < tomorrowSunrise ) {
+            }
+            
+			if (currenttime > sunsetStr && currenttime < sunriseStr ) {
 			globalContext.set("isNight",true);
 			node.status({fill:"blue",shape:"dot",text:"Night"});
 			msg.topic = "isNight";
 			msg.payload = true;
 			}
-                        callback();
-                    }
-                });
-            }).on('error', function(e) {
-                callback(e);
-            });
-        } else {
-            callback(RED._("nighttime.error.invalid-url"));
+            callback();
+            }
+            else {
+            callback(RED._("nighttime.error.invalid-lat_lon"));
         }
-    }
 
     function NightTimeNode(n) {
         RED.nodes.createNode(this, n);
         var node = this;
-        this.repeat = 300000;
+        this.repeat = 60000;
         this.interval_id = null;
-        var previousdata = null;
         this.interval_id = setInterval( function() {
             node.emit("input",{});
         }, this.repeat );
@@ -126,68 +73,8 @@ module.exports = function(RED) {
                 clearInterval(this.interval_id);
             }
         });
-
         node.emit("input",{});
     }
 
-    function DarkSkyQueryNode(n) {
-        RED.nodes.createNode(this,n);
-        var node = this;
-
-        this.on ('input', function(msg) {
-            var lat;
-            var lon;
-
-            if (n.lat && n.lon) {
-                if (90 >= n.lat && 180 >= n.lon && n.lat >= -90 && n.lon >= -180) {
-                    lat = n.lat;
-                    lon = n.lon;
-                } else {
-                    node.error(RED._("nighttime.error.settings-invalid-lat_lon"));
-                    return;
-                }
-            } else if (msg.location) {
-                //query node code to check the input for information.
-                if (msg.location.lat && msg.location.lon) {
-                    if (90 >= msg.location.lat && 180 >= msg.location.lon && msg.location.lat >= -90 && msg.location.lon >= -180) {
-                        lat = msg.location.lat;
-                        lon = msg.location.lon;
-                    } else {
-                        node.error(RED._("nighttime.error.msg-invalid-lat_lon"));
-                        return;
-                    }
-                }
-            }
-
-            //the date string is in the format YYYY-MM-DD
-            //the time string is in the format HH:MM
-
-            assignmentFunction(node, lat, lon, RED.nodes.getNode(n.nighttime), function(err) {
-                if (err) {
-                    node.error(err,msg);
-                } else {
-                    weatherPoll(node, msg, function(err) {
-                        if (err) {
-                            node.error(err,msg);
-                        } else {
-                            node.send(msg);
-                        }
-                    });
-                }
-            });
-        });
-    }
-
-    function APICredentials(n) {
-        RED.nodes.createNode(this,n);
-        this.key_identifier = n.key_identifier;
-    }
-
-    RED.nodes.registerType("nighttime-credentials",APICredentials,{
-        credentials: {
-            key_identifier: {type:"text"},
-            client_key: {type:"password"}
-        }
-    });
     RED.nodes.registerType("nighttime",NightTimeNode);
 };
