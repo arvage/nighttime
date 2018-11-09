@@ -75,9 +75,9 @@
 
 <script type="text/x-red" data-help-name="nighttime">
     <p>A simple node indicating if it's day or night.</p>
-    <p>The node sets: <code>msg.payload</code> to boolean "true" or "false" payloads.</p>
-    <p>The node checks every 2 minutes if current time and date is bigger than todays sunset and less than tomorrow's sunrise times.</p>
-    <p>it sends a "true" payload if it is dark and "false" if not dark.</p>
+    <p>The node sets: <code>msg.payload</code> to boolean <code>true</code> or <code>false</code> payloads. it also sets a global <code>isNight</code> accessible in all flows.</p>
+    <p>The node checks every 2 minutes to poll new data.</p>
+    <p>it sends a <code>true</code> payload if it is dark and <code>false</code> if not dark.</p>
     <p>This is done using DarkSky API and with latitude and longitude set of coordinates.</p>
     <p>You need to open free account on DarkSky.net and get an API key in order to make this node working.</p>
     <p>Powered by the <a href="https://darksky.net/poweredby/" target="_blank">Dark Sky Forecast API</a>.</p>

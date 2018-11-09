@@ -22,7 +22,6 @@ module.exports = function(RED) {
 
     function weatherPoll(node, msg, callback) {
         var url;
-        var when;
         //If node settings are available, it prioritises these. If the node settings are missing, it checks the msg input instead.
 
         var today = new Date();
@@ -38,7 +37,6 @@ module.exports = function(RED) {
 
         if (node.lat && node.lon && node.apikey) {
             url = ("https://api.darksky.net/forecast/" + node.apikey + "/" + node.lat + "," + node.lon);
-            when = 0;
         }
         //If the URL is not initialised, there has been an error with the input data,
         //and a node.error is reported.
@@ -57,20 +55,27 @@ module.exports = function(RED) {
                     } else {
                         var jsun;
 			var currenttime = new Date().getTime() / 1000;
-			var sunset;
+			var todaySunrise;
+			var tomorrowSunrise;
+			var todaySunset;
+			var globalContext = node.context().global;
                         try {
                             jsun = JSON.parse(weather);
                         } catch (err) {
                             return callback(RED._("nighttime.error.api-response", { response:weather }));
                         }
-                        sunset = jsun.daily.data[when].sunsetTime;
-			if ( currenttime < sunset) {
+                        todaySunset = jsun.daily.data[0].sunsetTime;
+			todaySunrise = jsun.daily.data[0].sunriseTime;
+			tomorrowSunrise = jsun.daily.data[1].sunriseTime;
+			if ( currenttime < todaySunset && currenttime > todaySunrise) {
+			globalContext.set("isNight",false);
 			node.status({fill:"yellow",shape:"dot",text:"Day"});
 			msg.topic = "isNight";
 			msg.payload = false;
 			}
 
-			if (currenttime > sunset) {
+			if (currenttime > todaySunset && currenttime < tomorrowSunrise ) {
+			globalContext.set("isNight",true);
 			node.status({fill:"blue",shape:"dot",text:"Night"});
 			msg.topic = "isNight";
 			msg.payload = true;
@@ -92,7 +97,6 @@ module.exports = function(RED) {
         this.repeat = 120000;
         this.interval_id = null;
         var previousdata = null;
-
         this.interval_id = setInterval( function() {
             node.emit("input",{});
         }, this.repeat );
