@@ -3,7 +3,7 @@ module.exports = function(RED) {
     "use strict";
     var SunCalc = require('suncalc');
 
-    function assignmentFunction(node, lat, lon, callback) {
+ /*   function assignmentFunction(node, lat, lon, callback) {
         if (90 >= lat && 180 >= lon && lat >= -90 && lon >= -180) {
             node.lat = lat;
             node.lon = lon;
@@ -12,7 +12,7 @@ module.exports = function(RED) {
         }
         callback();
     }
-
+*/
         if (node.lat && node.lon) {
             var times = SunCalc.getTimes(new Date(), n.lat, n.lon);
             var sunriseStr = times.sunrise.getHours() + ':' + times.sunrise.getMinutes();
@@ -35,7 +35,7 @@ module.exports = function(RED) {
             //callback();
             }
             else {
-            callback(RED._("nighttime.error.invalid-lat_lon"));
+            //callback(RED._("nighttime.error.invalid-lat_lon"));
         }
 
     function NightTimeNode(n) {
@@ -47,19 +47,8 @@ module.exports = function(RED) {
             node.emit("input",{});
         }, this.repeat );
 
-        this.on('input', function(msg) {
-            assignmentFunction(node, n.lat, n.lon, RED.nodes.getNode(n.nighttime), function(err) {
-                if (err) {
-                    node.error(err,msg);
-                } else {                        
-                        //var msgString = JSON.stringify(msg.payload);
-//                            if (msgString !== previousdata) {
-//                                previousdata = msgString;
-                        node.send(msg);
-//                            }
-                    
-                }
-            });
+        this.on('input', function(msg) {                   
+            node.send(msg);
         });
 
         this.on("close", function() {
