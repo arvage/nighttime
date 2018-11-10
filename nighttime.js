@@ -33,7 +33,7 @@ module.exports = function(RED) {
             }
             else { 
                 node.status({fill:"blue",shape:"dot",text:"Night"}); 
-                globalContext.set("isNight",true);
+                globalContext.set("isNight",false);
             }
             if (msg.payload != oldval) {
                 oldval = msg.payload;
