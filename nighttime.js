@@ -2,16 +2,17 @@ module.exports = function(RED) {
     "use strict";
     var SunCalc = require('suncalc');
 
-    function NightTimeNode(n) {
+    function SunNode(n) {
         RED.nodes.createNode(this,n);
-	    this.lat = n.lat;
-	    this.lon = n.lon;
+        this.lat = n.lat;
+        this.lon = n.lon;
         this.start = n.start;
-	    this.end = n.end;
+        this.end = n.end;
+
         var node = this;
         var oldval = null;
-        
-	    var tick = function() {
+
+        var tick = function() {
             var now = new Date();
             var times = SunCalc.getTimes(now, node.lat, node.lon);
             var nowMillis = Date.UTC(now.getUTCFullYear(),now.getUTCMonth(),now.getUTCDate(),now.getUTCHours(),now.getUTCMinutes());
@@ -22,10 +23,10 @@ module.exports = function(RED) {
             if (isNaN(e1)) { e1 = 1; }
             if (isNaN(e2)) { e2 = -1; }
             var moon = parseInt(SunCalc.getMoonIllumination(now).fraction * 100 + 0.5) / 100;
-            var msg = {payload:true, topic:"isNight"};
-            if ((e1 > 0) & (e2 < 0)) { msg.payload = false; }
+            var msg = {payload:0, topic:"sun", moon:moon};
+            if ((e1 > 0) & (e2 < 0)) { msg.payload = 1; }
             if (oldval == null) { oldval = msg.payload; }
-            if (msg.payload == false) { node.status({fill:"yellow",shape:"dot",text:"day"}); }
+            if (msg.payload == 1) { node.status({fill:"yellow",shape:"dot",text:"day"}); }
             else { node.status({fill:"blue",shape:"dot",text:"night"}); }
             if (msg.payload != oldval) {
                 oldval = msg.payload;
@@ -42,5 +43,5 @@ module.exports = function(RED) {
             if (this.tick) { clearInterval(this.tick); }
         });
     }
-    RED.nodes.registerType("nighttime",NightTimeNode);
+    RED.nodes.registerType("nighttime",SunNode);
 };
