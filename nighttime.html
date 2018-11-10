@@ -26,8 +26,8 @@
 
 <script type="text/javascript">
     RED.nodes.registerType('nighttime',{
-        category: 'input',
-        color: '#7AA0D2',
+        category: 'advanced-input',
+        color: '#ffcc66',
         defaults: {
 	    name: {value: "nighttime"},
             lon: {value:"", validate:function(v) {return ((v>=-180) && (v<=180));} },
@@ -35,7 +35,7 @@
         },
         inputs:0,
         outputs:2,
-        icon: "weather.png",
+        icon: "sun.png",
         label: function() { 
         return this.name || "nighttime";},
         labelStyle: function() {
