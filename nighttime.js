@@ -52,7 +52,7 @@ module.exports = function(RED) {
                 if (err) {
                     node.error(err,msg);
                 } else {                        
-                        var msgString = JSON.stringify(msg.payload);
+                        //var msgString = JSON.stringify(msg.payload);
 //                            if (msgString !== previousdata) {
 //                                previousdata = msgString;
                         node.send(msg);
