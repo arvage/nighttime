@@ -17,6 +17,13 @@
     </div>
 </script>
 
+<script type="text/x-red" data-help-name="nighttime">
+    <p>A simple node indicating if it's day or night.</p>
+    <p>The node sets: <code>msg.payload</code> to boolean <code>true</code> or <code>false</code> payloads. it also sets a global <code>isNight</code> accessible in all flows.</p>
+    <p>The node checks every minute to poll new data.</p>
+    <p>it sends a <code>true</code> payload if it is dark and <code>false</code> if not dark.</p>
+</script>
+
 <script type="text/javascript">
     RED.nodes.registerType('nighttime',{
         category: 'input',
@@ -31,9 +38,10 @@
         icon: "weather.png",
         label: function() { 
         return this.name || "nighttime";},
-    });
-
- /*       oneditprepare: function() {
+        labelStyle: function() {
+            return this.name?"node_label_italic":"";
+        },
+        oneditprepare: function() {
             if (($("#node-input-lat").val() === "") && ($("#node-input-lon").val() === "")) {
                 if ("geolocation" in navigator) {
                     navigator.geolocation.getCurrentPosition(function(position) {
@@ -44,12 +52,4 @@
             }
         }
     });
-    */
-</script>
-
-<script type="text/x-red" data-help-name="nighttime">
-    <p>A simple node indicating if it's day or night.</p>
-    <p>The node sets: <code>msg.payload</code> to boolean <code>true</code> or <code>false</code> payloads. it also sets a global <code>isNight</code> accessible in all flows.</p>
-    <p>The node checks every minute to poll new data.</p>
-    <p>it sends a <code>true</code> payload if it is dark and <code>false</code> if not dark.</p>
 </script>
