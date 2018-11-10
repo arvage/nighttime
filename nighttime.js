@@ -23,11 +23,11 @@ module.exports = function(RED) {
             if (isNaN(e1)) { e1 = 1; }
             if (isNaN(e2)) { e2 = -1; }
             var moon = parseInt(SunCalc.getMoonIllumination(now).fraction * 100 + 0.5) / 100;
-            var msg = {payload:0, topic:"sun", moon:moon};
-            if ((e1 > 0) & (e2 < 0)) { msg.payload = 1; }
+            var msg = {payload:false, topic:"isNight"};
+            if ((e1 > 0) & (e2 < 0)) { msg.payload = true; }
             if (oldval == null) { oldval = msg.payload; }
-            if (msg.payload == 1) { node.status({fill:"yellow",shape:"dot",text:"day"}); }
-            else { node.status({fill:"blue",shape:"dot",text:"night"}); }
+            if (msg.payload == true) { node.status({fill:"yellow",shape:"dot",text:"Day"}); }
+            else { node.status({fill:"blue",shape:"dot",text:"Night"}); }
             if (msg.payload != oldval) {
                 oldval = msg.payload;
                 node.send([msg,msg]);
