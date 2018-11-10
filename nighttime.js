@@ -23,7 +23,7 @@ module.exports = function(RED) {
 		        msg.topic = "isNight";
 		        msg.payload = false;
         	}
-            if (currenttime > sunsetStr && currenttime < sunriseStr ) {
+            if (currenttime > sunsetStr || currenttime < sunriseStr ) {
 		        globalContext.set("isNight",true);
 		        node.status({fill:"blue",shape:"dot",text:"Night"});
 		        msg.topic = "isNight";
