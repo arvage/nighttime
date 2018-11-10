@@ -27,11 +27,13 @@
             lat: {value:"", validate:function(v) {return ((v>=-90) && (v<=90));} },
         },
         inputs:0,
-        outputs:2,
+        outputs:1,
         icon: "weather.png",
         label: function() { 
         return this.name || "nighttime";},
-        oneditprepare: function() {
+    });
+
+ /*       oneditprepare: function() {
             if (($("#node-input-lat").val() === "") && ($("#node-input-lon").val() === "")) {
                 if ("geolocation" in navigator) {
                     navigator.geolocation.getCurrentPosition(function(position) {
@@ -42,6 +44,7 @@
             }
         }
     });
+    */
 </script>
 
 <script type="text/x-red" data-help-name="nighttime">
