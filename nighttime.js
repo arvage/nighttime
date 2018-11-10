@@ -28,11 +28,11 @@ module.exports = function(RED) {
             if ((e1 > 0) & (e2 < 0)) { msg.payload = false; }
             if (oldval == null) { oldval = msg.payload; }
             if (msg.payload == true) { 
-                node.status({fill:"yellow",shape:"dot",text:"Night"}); 
+                node.status({fill:"blue",shape:"dot",text:"Night"}); 
                 globalContext.set("isNight",true);
             }
             else { 
-                node.status({fill:"blue",shape:"dot",text:"Day"}); 
+                node.status({fill:"yellow",shape:"dot",text:"Day"}); 
                 globalContext.set("isNight",false);
             }
             if (msg.payload != oldval) {
