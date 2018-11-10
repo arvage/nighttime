@@ -10,8 +10,9 @@ module.exports = function(RED) {
 	    this.end = n.end;
         var node = this;
         var oldval = null;
-        var msg = {payload:0, topic:"isNight"};
+        
 	    var tick = function() {
+            var msg = {payload:0, topic:"isNight"};
     	    var times = SunCalc.getTimes(new Date(), n.lat, n.lon);
     	    var sunriseStr = times.sunrise.getHours() + ':' + times.sunrise.getMinutes();
     	    var sunsetStr = times.sunset.getHours() + ':' + times.sunset.getMinutes();
@@ -34,7 +35,9 @@ module.exports = function(RED) {
                 oldval = msg.payload;
                 node.send([msg,msg]);
             }
-            else { node.send(msg); }
+            else { 
+                node.send(msg); 
+            }
         }
 	    this.tick = setInterval(function() { tick(); }, 60000);
         this.tock = setTimeout(function() { tick(); }, 500);
