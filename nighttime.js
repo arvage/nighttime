@@ -20,14 +20,21 @@ module.exports = function(RED) {
             var endMillis = Date.UTC(times[node.end].getUTCFullYear(),times[node.end].getUTCMonth(),times[node.end].getUTCDate(),times[node.end].getUTCHours(),times[node.end].getUTCMinutes());
             var e1 = nowMillis - startMillis;
             var e2 = nowMillis - endMillis;
+            var globalContext = node.context().global;
             if (isNaN(e1)) { e1 = 1; }
             if (isNaN(e2)) { e2 = -1; }
             var moon = parseInt(SunCalc.getMoonIllumination(now).fraction * 100 + 0.5) / 100;
-            var msg = {payload:false, topic:"isNight"};
-            if ((e1 > 0) & (e2 < 0)) { msg.payload = true; }
+            var msg = {payload:true, topic:"isNight"};
+            if ((e1 > 0) & (e2 < 0)) { msg.payload = false; }
             if (oldval == null) { oldval = msg.payload; }
-            if (msg.payload == true) { node.status({fill:"yellow",shape:"dot",text:"Day"}); }
-            else { node.status({fill:"blue",shape:"dot",text:"Night"}); }
+            if (msg.payload == true) { 
+                node.status({fill:"yellow",shape:"dot",text:"Day"}); 
+                globalContext.set("isNight",true);
+            }
+            else { 
+                node.status({fill:"blue",shape:"dot",text:"Night"}); 
+                globalContext.set("isNight",true);
+            }
             if (msg.payload != oldval) {
                 oldval = msg.payload;
                 node.send([msg,msg]);
