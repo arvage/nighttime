@@ -15,7 +15,8 @@
     "night",
     "dark",
     "sunset",
-    "sunrise"
+    "sunrise",
+    "day"
   ],
   "node-red": {
     "nodes": {
