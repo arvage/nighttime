@@ -10,7 +10,7 @@ module.exports = function(RED) {
 	    this.end = n.end;
         var node = this;
         var oldval = null;
-        var msg;
+        var msg = {payload:0, topic:"isNight"};
 	    var tick = function() {
     	    var times = SunCalc.getTimes(new Date(), n.lat, n.lon);
     	    var sunriseStr = times.sunrise.getHours() + ':' + times.sunrise.getMinutes();
