@@ -2,7 +2,6 @@
 module.exports = function(RED) {
     "use strict";
     var SunCalc = require('suncalc');
-    var https = require("https");
 
     function assignmentFunction(node, lat, lon, callback) {
         if (90 >= lat && 180 >= lon && lat >= -90 && lon >= -180) {
@@ -33,7 +32,7 @@ module.exports = function(RED) {
 			msg.topic = "isNight";
 			msg.payload = true;
 			}
-            callback();
+            //callback();
             }
             else {
             callback(RED._("nighttime.error.invalid-lat_lon"));
@@ -52,18 +51,13 @@ module.exports = function(RED) {
             assignmentFunction(node, n.lat, n.lon, RED.nodes.getNode(n.nighttime), function(err) {
                 if (err) {
                     node.error(err,msg);
-                } else {
-                    weatherPoll(node, msg, function(err) {
-                        if (err) {
-                            node.error(err,msg);
-                        } else {
-                            var msgString = JSON.stringify(msg.payload);
+                } else {                        
+                        var msgString = JSON.stringify(msg.payload);
 //                            if (msgString !== previousdata) {
 //                                previousdata = msgString;
-                                node.send(msg);
+                        node.send(msg);
 //                            }
-                        }
-                    });
+                    
                 }
             });
         });
