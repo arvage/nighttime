@@ -12,35 +12,31 @@ module.exports = function(RED) {
         var oldval = null;
         
 	    var tick = function() {
-            var msg = {payload:0, topic:"isNight"};
-    	    var times = SunCalc.getTimes(new Date(), n.lat, n.lon);
-    	    var sunriseStr = times.sunrise.getHours() + ':' + times.sunrise.getMinutes();
-    	    var sunsetStr = times.sunset.getHours() + ':' + times.sunset.getMinutes();
-    	    var currenttime = new Date().getHours() + ':' + new Date().getMinutes();
-    	    var globalContext = node.context().global;
-		    if ( currenttime < sunsetStr && currenttime > sunriseStr) {
-		        globalContext.set("isNight",false);
-		        node.status({fill:"yellow",shape:"dot",text:"Day"});
-		        msg.topic = "isNight";
-		        msg.payload = false;
-        	}
-            if (currenttime > sunsetStr || currenttime < sunriseStr ) {
-		        globalContext.set("isNight",true);
-		        node.status({fill:"blue",shape:"dot",text:"Night"});
-		        msg.topic = "isNight";
-		        msg.payload = true;
-            }
+            var now = new Date();
+            var times = SunCalc.getTimes(now, node.lat, node.lon);
+            var nowMillis = Date.UTC(now.getUTCFullYear(),now.getUTCMonth(),now.getUTCDate(),now.getUTCHours(),now.getUTCMinutes());
+            var startMillis = Date.UTC(times[node.start].getUTCFullYear(),times[node.start].getUTCMonth(),times[node.start].getUTCDate(),times[node.start].getUTCHours(),times[node.start].getUTCMinutes());
+            var endMillis = Date.UTC(times[node.end].getUTCFullYear(),times[node.end].getUTCMonth(),times[node.end].getUTCDate(),times[node.end].getUTCHours(),times[node.end].getUTCMinutes());
+            var e1 = nowMillis - startMillis;
+            var e2 = nowMillis - endMillis;
+            if (isNaN(e1)) { e1 = 1; }
+            if (isNaN(e2)) { e2 = -1; }
+            var moon = parseInt(SunCalc.getMoonIllumination(now).fraction * 100 + 0.5) / 100;
+            var msg = {payload:true, topic:"isNight"};
+            if ((e1 > 0) & (e2 < 0)) { msg.payload = false; }
             if (oldval == null) { oldval = msg.payload; }
+            if (msg.payload == false) { node.status({fill:"yellow",shape:"dot",text:"day"}); }
+            else { node.status({fill:"blue",shape:"dot",text:"night"}); }
             if (msg.payload != oldval) {
                 oldval = msg.payload;
                 node.send([msg,msg]);
             }
-            else { 
-                node.send(msg); 
-            }
+            else { node.send(msg); }
         }
-	    this.tick = setInterval(function() { tick(); }, 60000);
+
+        this.tick = setInterval(function() { tick(); }, 60000);
         this.tock = setTimeout(function() { tick(); }, 500);
+
         this.on("close", function() {
             if (this.tock) { clearTimeout(this.tock); }
             if (this.tick) { clearInterval(this.tick); }
