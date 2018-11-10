@@ -4,11 +4,7 @@ The node sets: <code>msg.payload</code> to boolean <code>true</code> or <code>fa
 
 it sends a <code>true</code> payload if it is dark and <code>false</code> if not dark.
 
-This is done using DarkSky API and with latitude and longitude set of coordinates.
-
-You need to open free account on DarkSky.net and get an API key in order to make this node working.
-
-DarkSky provides 1000 calls a day and you can have maximum of 3 nodes for free.to have more nodes you need to get a paid account.
+The second output emits only on the transition between night to day or day to night.
 
 Here are use-case examples:
 ```json
