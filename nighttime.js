@@ -15,6 +15,8 @@ module.exports = function(RED) {
         var tick = function() {
             var now = new Date();
             var times = SunCalc.getTimes(now, node.lat, node.lon);
+            var sunriseStr = times.sunrise.getHours() + ':' + times.sunrise.getMinutes();
+            var sunsetStr = times.sunset.getHours() + ':' + times.sunset.getMinutes();
             var nowMillis = Date.UTC(now.getUTCFullYear(),now.getUTCMonth(),now.getUTCDate(),now.getUTCHours(),now.getUTCMinutes());
             var startMillis = Date.UTC(times[node.start].getUTCFullYear(),times[node.start].getUTCMonth(),times[node.start].getUTCDate(),times[node.start].getUTCHours(),times[node.start].getUTCMinutes());
             var endMillis = Date.UTC(times[node.end].getUTCFullYear(),times[node.end].getUTCMonth(),times[node.end].getUTCDate(),times[node.end].getUTCHours(),times[node.end].getUTCMinutes());
@@ -28,11 +30,11 @@ module.exports = function(RED) {
             if ((e1 > 0) & (e2 < 0)) { msg.payload = false; }
             if (oldval == null) { oldval = msg.payload; }
             if (msg.payload == true) { 
-                node.status({fill:"blue",shape:"dot",text:"Night"}); 
+                node.status({fill:"blue",shape:"dot",text: "Sunset" + sunsetStr + "Night"}); 
                 globalContext.set("isNight",true);
             }
             else { 
-                node.status({fill:"yellow",shape:"dot",text:"Day"}); 
+                node.status({fill:"yellow",shape:"dot",text:"Sunrise" + sunriseStr +"Day"}); 
                 globalContext.set("isNight",false);
             }
             if (msg.payload != oldval) {
