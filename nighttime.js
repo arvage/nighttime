@@ -25,7 +25,6 @@ module.exports = function(RED) {
             var globalContext = node.context().global;
             if (isNaN(e1)) { e1 = 1; }
             if (isNaN(e2)) { e2 = -1; }
-            var moon = parseInt(SunCalc.getMoonIllumination(now).fraction * 100 + 0.5) / 100;
             var msg = {payload:true, topic:"isNight", sunset:sunsetStr, sunrise:sunriseStr};
             if ((e1 > 0) & (e2 < 0)) { msg.payload = false}
             if (oldval == null) { oldval = msg.payload; }
