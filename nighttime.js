@@ -26,15 +26,15 @@ module.exports = function(RED) {
             if (isNaN(e1)) { e1 = 1; }
             if (isNaN(e2)) { e2 = -1; }
             var moon = parseInt(SunCalc.getMoonIllumination(now).fraction * 100 + 0.5) / 100;
-            var msg = {payload:true, topic:"isNight"};
-            if ((e1 > 0) & (e2 < 0)) { msg.payload = false; }
+            var msg = {payload:true, topic:"isNight", sunset:sunsetStr, sunrise:sunriseStr};
+            if ((e1 > 0) & (e2 < 0)) { msg.payload = false}
             if (oldval == null) { oldval = msg.payload; }
             if (msg.payload == true) { 
-                node.status({fill:"blue",shape:"dot",text: "Sunset" + sunsetStr + "Night"}); 
+                node.status({fill:"blue",shape:"dot",text:"Night"}); 
                 globalContext.set("isNight",true);
             }
             else { 
-                node.status({fill:"yellow",shape:"dot",text:"Sunrise" + sunriseStr +"Day"}); 
+                node.status({fill:"yellow",shape:"dot",text:"Day"}); 
                 globalContext.set("isNight",false);
             }
             if (msg.payload != oldval) {
