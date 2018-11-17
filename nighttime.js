@@ -15,8 +15,18 @@ module.exports = function(RED) {
         var tick = function() {
             var now = new Date();
             var times = SunCalc.getTimes(now, node.lat, node.lon);
+            var nauticalDawnStr = times.nauticalDawn.getHours() + ':' + times.nauticalDawn.getMinutes();
+            var dawnStr = times.dawn.getHours() + ':' + times.dawn.getMinutes();
             var sunriseStr = times.sunrise.getHours() + ':' + times.sunrise.getMinutes();
+            var sunriseEndStr = time.sunriseEndStr.getHours() + ':' + times.sunriseEndStr.getMinutes();
+            var goldenHourEndStr = time.goldenHourEnd.getHours() + ':' + times.goldenHourEnd.getMinutes();
+
+            var goldenHourStr = times.goldenHour.getHours() + ':' + times.goldenHour.getMinutes();
+            var sunsetStartStr = times.sunsetStart.getHours() + ':' + times.sunsetStart.getMinutes();
             var sunsetStr = times.sunset.getHours() + ':' + times.sunset.getMinutes();
+            var duskStr = times.dusk.getHours() + ':' + times.dusk.getMinutes();
+            var nauticalDuskStr = times.nauticalDusk.getHours() + ':' + times.nauticalDusk.getMinutes();
+            var nightStr = times.night.getHours() + ':' + times.night.getMinutes();
             var nowMillis = Date.UTC(now.getUTCFullYear(),now.getUTCMonth(),now.getUTCDate(),now.getUTCHours(),now.getUTCMinutes());
             var startMillis = Date.UTC(times[node.start].getUTCFullYear(),times[node.start].getUTCMonth(),times[node.start].getUTCDate(),times[node.start].getUTCHours(),times[node.start].getUTCMinutes());
             var endMillis = Date.UTC(times[node.end].getUTCFullYear(),times[node.end].getUTCMonth(),times[node.end].getUTCDate(),times[node.end].getUTCHours(),times[node.end].getUTCMinutes());
@@ -25,7 +35,19 @@ module.exports = function(RED) {
             var globalContext = node.context().global;
             if (isNaN(e1)) { e1 = 1; }
             if (isNaN(e2)) { e2 = -1; }
-            var msg = {payload:true, topic:"isNight", sunset:sunsetStr, sunrise:sunriseStr};
+            var msg = {payload:true, topic:"isNight", 
+            nauticalDawn:nauticalDawnStr,
+            dawn:dawnStr,
+            sunrise:sunriseStr,
+            sunriseEnd:sunriseEndStr,
+            goldenHourEnd:goldenHourEndStr,
+            goldenHour:goldenHourStr,
+            sunsetStart:sunsetStartStr,
+            sunset:sunsetStr,
+            dusk:duskStr,
+            nauticalDusk:nauticalDuskStr,
+            night:nightStr
+         };
             if ((e1 > 0) & (e2 < 0)) { msg.payload = false}
             if (oldval == null) { oldval = msg.payload; }
             if (msg.payload == true) { 
