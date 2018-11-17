@@ -18,7 +18,7 @@ module.exports = function(RED) {
             var nauticalDawnStr = times.nauticalDawn.getHours() + ':' + times.nauticalDawn.getMinutes();
             var dawnStr = times.dawn.getHours() + ':' + times.dawn.getMinutes();
             var sunriseStr = times.sunrise.getHours() + ':' + times.sunrise.getMinutes();
-            var sunriseEndStr = time.sunriseEndStr.getHours() + ':' + times.sunriseEndStr.getMinutes();
+            var sunriseEndStr = time.sunriseEnd.getHours() + ':' + times.sunriseEnd.getMinutes();
             var goldenHourEndStr = time.goldenHourEnd.getHours() + ':' + times.goldenHourEnd.getMinutes();
 
             var goldenHourStr = times.goldenHour.getHours() + ':' + times.goldenHour.getMinutes();
